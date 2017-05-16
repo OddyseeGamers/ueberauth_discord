@@ -1,6 +1,6 @@
-# Überauth Discord
+# Überauth Wordpress
 
-> Discord OAuth2 strategy for Überauth.
+> Wordpress OAuth2 strategy for Überauth.
 
 For additional documentation on Discord's OAuth implementation see [discord-oauth2-example](https://github.com/hammerandchisel/discord-oauth2-example).
 
@@ -8,11 +8,11 @@ For additional documentation on Discord's OAuth implementation see [discord-oaut
 
 1. Setup your application at [Discord Developers](https://discordapp.com/developers/applications/me).
 
-1. Add `:ueberauth_discord` to your list of dependencies in `mix.exs`:
+1. Add `:ueberauth_wordpress` to your list of dependencies in `mix.exs`:
 
     ```elixir
     def deps do
-      [{:ueberauth_discord, "~> 0.3"}]
+      [{:ueberauth_wordpress, "~> 0.0.1"}]
     end
     ```
 
@@ -20,25 +20,25 @@ For additional documentation on Discord's OAuth implementation see [discord-oaut
 
     ```elixir
     def application do
-      [applications: [:ueberauth_discord]]
+      [applications: [:ueberauth_wordpress]]
     end
     ```
 
-1. Add Discord to your Überauth configuration:
+1. Add Wordpress to your Überauth configuration:
 
     ```elixir
     config :ueberauth, Ueberauth,
       providers: [
-        discord: {Ueberauth.Strategy.Discord, []}
+        discord: {Ueberauth.Strategy.Wordpress, []}
       ]
     ```
 
 1.  Update your provider configuration:
 
     ```elixir
-    config :ueberauth, Ueberauth.Strategy.Discord.OAuth,
-      client_id: System.get_env("DISCORD_CLIENT_ID"),
-      client_secret: System.get_env("DISCORD_CLIENT_SECRET")
+    config :ueberauth, Ueberauth.Strategy.Wordpress.OAuth,
+      client_id: System.get_env("WORDPRESS_CLIENT_ID"),
+      client_secret: System.get_env("WORDPRESS_CLIENT_SECRET")
     ```
 
 1.  Include the Überauth plug in your controller:
@@ -81,10 +81,10 @@ By default the requested scope is "identify". Scope can be configured either exp
 ```elixir
 config :ueberauth, Ueberauth,
   providers: [
-    discord: {Ueberauth.Strategy.Discord, [default_scope: "identify email connections guilds"]}
+    discord: {Ueberauth.Strategy.Wordpress, [default_scope: "identify email connections guilds"]}
   ]
 ```
 
 ## License
 
-Please see [LICENSE](https://github.com/schwarz/ueberauth_discord/blob/master/LICENSE) for licensing details.
+Please see [LICENSE](https://github.com/schwarz/ueberauth_wordpress/blob/master/LICENSE) for licensing details.

@@ -1,14 +1,14 @@
-defmodule UeberauthDiscord.Mixfile do
+defmodule UeberauthWordpress.Mixfile do
   use Mix.Project
 
-  @version "0.3.0"
-  @url "https://github.com/schwarz/ueberauth_discord"
+  @version "0.0.1"
+  @url "https://github.com/OddyseeGamers/ueberauth_wordpress"
 
   def project do
-    [app: :ueberauth_discord,
+    [app: :ueberauth_wordpress,
      version: @version,
      elixir: "~> 1.3",
-     name: "Ueberauth Discord",
+     name: "Ueberauth Wordpress",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      source_url: @url,
@@ -35,12 +35,12 @@ defmodule UeberauthDiscord.Mixfile do
   end
 
   defp description do
-    "An Uberauth strategy for Discord authentication."
+    "An Uberauth strategy for Wordpress authentication."
   end
 
   defp package do
     [files: ["lib", "mix.exs", "README.md", "LICENSE"],
-     maintainers: ["Bernhard Schwarz"],
+     maintainers: ["Martin Skowronski"],
      licenses: ["MIT"],
      links: %{"GitHub": @url}]
   end
