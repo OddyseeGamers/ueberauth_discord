@@ -3,7 +3,7 @@ defmodule Ueberauth.Strategy.Wordpress do
   Wordpress Strategy for Überauth.
   """
 
-  use Ueberauth.Strategy, uid_field: :id, default_scope: "identify"
+  use Ueberauth.Strategy, uid_field: :id, default_scope: "basic,profile,email"
 
   alias Ueberauth.Auth.Info
   alias Ueberauth.Auth.Credentials

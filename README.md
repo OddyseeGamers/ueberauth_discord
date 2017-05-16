@@ -29,7 +29,7 @@ For additional documentation on Discord's OAuth implementation see [discord-oaut
     ```elixir
     config :ueberauth, Ueberauth,
       providers: [
-        discord: {Ueberauth.Strategy.Wordpress, []}
+        wordpress: {Ueberauth.Strategy.Wordpress, []}
       ]
     ```
 
@@ -38,7 +38,8 @@ For additional documentation on Discord's OAuth implementation see [discord-oaut
     ```elixir
     config :ueberauth, Ueberauth.Strategy.Wordpress.OAuth,
       client_id: System.get_env("WORDPRESS_CLIENT_ID"),
-      client_secret: System.get_env("WORDPRESS_CLIENT_SECRET")
+      client_secret: System.get_env("WORDPRESS_CLIENT_SECRET"),
+      host: System.get_env("WORDPRESS_HOST")
     ```
 
 1.  Include the Überauth plug in your controller:
