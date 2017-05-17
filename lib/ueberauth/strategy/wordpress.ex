@@ -3,7 +3,7 @@ defmodule Ueberauth.Strategy.Wordpress do
   Wordpress Strategy for Überauth.
   """
 
-  use Ueberauth.Strategy, uid_field: :id, default_scope: "basic,profile,email"
+  use Ueberauth.Strategy, uid_field: :ID, default_scope: "email profile"
 
   alias Ueberauth.Auth.Info
   alias Ueberauth.Auth.Credentials
@@ -38,8 +38,6 @@ defmodule Ueberauth.Strategy.Wordpress do
       conn
       |> store_token(token)
       |> fetch_user(token)
-#        |> fetch_connections(token)
-#        |> fetch_guilds(token)
     end
   end
 
@@ -51,28 +49,28 @@ defmodule Ueberauth.Strategy.Wordpress do
   @doc false
   def handle_cleanup!(conn) do
     conn
-    |> put_private(:discord_token, nil)
-    |> put_private(:discord_user, nil)
-#      |> put_private(:discord_connections, nil)
-#      |> put_private(:discord_guilds, nil)
+    |> put_private(:wp_token, nil)
+    |> put_private(:wp_user, nil)
   end
 
   # Store the token for later use.
   @doc false
   defp store_token(conn, token) do
-    put_private(conn, :discord_token, token)
+    put_private(conn, :wp_token, token)
   end
 
   defp fetch_user(conn, token) do
-    path = "http://www.oddysee.org/oauth/me"
-    resp = Ueberauth.Strategy.Wordpress.OAuth.get(token, path)
+    config = Application.get_env(:ueberauth, Ueberauth.Strategy.Wordpress.OAuth)
+    host = Keyword.get(config, :host)
+    url = "#{host}/oauth/me/"
+    resp = Ueberauth.Strategy.Wordpress.OAuth.get(token, url)
 
     case resp do
       {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->
         set_errors!(conn, [error("token", "unauthorized")])
       {:ok, %OAuth2.Response{status_code: status_code, body: user}}
         when status_code in 200..399 ->
-        put_private(conn, :discord_user, user)
+        put_private(conn, :wp_user, user)
       {:error, %OAuth2.Error{reason: reason}} ->
         set_errors!(conn, [error("OAuth2", reason)])
     end
@@ -83,53 +81,12 @@ defmodule Ueberauth.Strategy.Wordpress do
     |> String.split(" ")
   end
 
-  defp fetch_connections(%Plug.Conn{assigns: %{ueberauth_failure: _fails}} = conn, _), do: conn
-
-  defp fetch_connections(conn, token) do
-    scopes = split_scopes(token)
-
-    case "connections" in scopes do
-      false -> conn
-      true ->
-        path = "https://discordapp.com/api/users/@me/connections"
-        case Ueberauth.Strategy.Wordpress.OAuth.get(token, path) do
-          {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->
-            set_errors!(conn, [error("token", "unauthorized")])
-          {:ok, %OAuth2.Response{status_code: status_code, body: connections}}
-            when status_code in 200..399 ->
-            put_private(conn, :discord_connections, connections)
-          {:error, %OAuth2.Error{reason: reason}} ->
-            set_errors!(conn, [error("OAuth2", reason)])
-        end
-    end
-  end
-
-  defp fetch_guilds(%Plug.Conn{assigns: %{ueberauth_failure: _fails}} = conn, _), do: conn
-
-  defp fetch_guilds(conn, token) do
-    scopes = split_scopes(token)
-
-    case "guilds" in scopes do
-      false -> conn
-      true ->
-        path = "https://discordapp.com/api/users/@me/guilds"
-        case Ueberauth.Strategy.Wordpress.OAuth.get(token, path) do
-          {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->
-            set_errors!(conn, [error("token", "unauthorized")])
-          {:ok, %OAuth2.Response{status_code: status_code, body: guilds}}
-            when status_code in 200..399 ->
-            put_private(conn, :discord_guilds, guilds)
-          {:error, %OAuth2.Error{reason: reason}} ->
-            set_errors!(conn, [error("OAuth2", reason)])
-        end
-    end
-  end
 
   @doc """
   Includes the credentials from the Wordpress response.
   """
   def credentials(conn) do
-    token = conn.private.discord_token
+    token = conn.private.wp_token
     scopes = split_scopes(token)
 
     %Credentials{
@@ -145,29 +102,22 @@ defmodule Ueberauth.Strategy.Wordpress do
   Fetches the fields to populate the info section of the `Ueberauth.Auth` struct.
   """
   def info(conn) do
-    user = conn.private.discord_user
+    user = conn.private.wp_user
 
     %Info{
       email: user["email"],
-#        image: fetch_image(user),
-      nickname: user["username"]
+      name: user["display_name"],
     }
   end
 
-  defp fetch_image(user) do
-    "https://discordcdn.com/avatars/#{user["id"]}/#{user["avatar"]}.jpg"
-  end
-
   @doc """
-  Stores the raw information (including the token, user, connections and guilds)
+  Stores the raw information (including the token and user)
   obtained from the Wordpress callback.
   """
   def extra(conn) do
     %{
-      discord_token: :token,
-      discord_user: :user,
-#        discord_connections: :connections,
-#        discord_guilds: :guilds
+      wp_token: :token,
+      wp_user: :user,
     }
     |> Enum.filter_map(fn {original_key, _} ->
       Map.has_key?(conn.private, original_key)
@@ -188,7 +138,7 @@ defmodule Ueberauth.Strategy.Wordpress do
       |> option(:uid_field)
       |> to_string
 
-    conn.private.discord_user[uid_field]
+    conn.private.wp_user[uid_field]
   end
 
   defp option(conn, key) do

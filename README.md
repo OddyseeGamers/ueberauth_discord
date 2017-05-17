@@ -1,12 +1,11 @@
 # Überauth Wordpress
 
-> Wordpress OAuth2 strategy for Überauth.
+> Wordpress OAuth2 strategy for Überauth based on [ueberauth_discord](https://github.com/schwarz/ueberauth_discord)
 
-For additional documentation on Discord's OAuth implementation see [discord-oauth2-example](https://github.com/hammerandchisel/discord-oauth2-example).
+For additional documentation on Wordpress's OAuth implementation see [wordpress-oauth-server](https://github.com/justingreerbbi/wordpress-oauth-server) and [wp-oauth.com](https://wp-oauth.com).
 
 ## Installation
 
-1. Setup your application at [Discord Developers](https://discordapp.com/developers/applications/me).
 
 1. Add `:ueberauth_wordpress` to your list of dependencies in `mix.exs`:
 
@@ -67,25 +66,6 @@ For additional documentation on Discord's OAuth implementation see [discord-oaut
 
 For an example implementation see the [Überauth Example](https://github.com/ueberauth/ueberauth_example) application.
 
-## Calling
-
-Depending on the configured url you can initial the request through:
-
-    /auth/discord
-
-Or with options:
-
-    /auth/discord?scope=identify%20email
-
-By default the requested scope is "identify". Scope can be configured either explicitly as a `scope` query value on the request path or in your configuration:
-
-```elixir
-config :ueberauth, Ueberauth,
-  providers: [
-    discord: {Ueberauth.Strategy.Wordpress, [default_scope: "identify email connections guilds"]}
-  ]
-```
-
 ## License
 
-Please see [LICENSE](https://github.com/schwarz/ueberauth_wordpress/blob/master/LICENSE) for licensing details.
+Please see [LICENSE](https://github.com/schwarz/ueberauth_discrod/blob/master/LICENSE) for licensing details.

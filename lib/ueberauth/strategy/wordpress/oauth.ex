@@ -6,18 +6,11 @@ defmodule Ueberauth.Strategy.Wordpress.OAuth do
 
   config :ueberauth, Ueberauth.Strategy.Wordpress.OAuth,
     client_id: System.get_env("WORDPRESS_CLIENT_ID"),
-    client_secret: System.get_env("WORDPRESS_CLIENT_SECRET")
+    client_secret: System.get_env("WORDPRESS_CLIENT_SECRET").
+    host: System.get_env("WORDPRESS_HOST")
   """
 
   use OAuth2.Strategy
-
-  @defaults [
-    strategy: __MODULE__,
-    site: "https://www.oddysee.org/oauth",
-    authorize_url: "https://www.oddysee.org/oauth/authorize",
-    token_url: "https://www.oddysee.org/oauth/token"
-  ]
-
 
   @doc """
   Construct a client for requests to Wordpress.
@@ -27,9 +20,14 @@ defmodule Ueberauth.Strategy.Wordpress.OAuth do
   """
   def client(opts \\ []) do
     config = Application.get_env(:ueberauth, Ueberauth.Strategy.Wordpress.OAuth)
-
+    host = Keyword.get(config, :host)
     opts =
-      @defaults
+      [
+        strategy: __MODULE__,
+        site: "#{host}/oauth",
+        authorize_url: "#{host}/oauth/authorize",
+        token_url: "#{host}/oauth/token"
+      ]
       |> Keyword.merge(config)
       |> Keyword.merge(opts)
 
@@ -72,4 +70,5 @@ defmodule Ueberauth.Strategy.Wordpress.OAuth do
     |> put_header("Accept", "application/json")
     |> OAuth2.Strategy.AuthCode.get_token(params, headers)
   end
+
 end
